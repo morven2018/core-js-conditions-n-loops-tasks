@@ -441,8 +441,34 @@ function rotateMatrix(matrix) {
  *  [2, 9, 5, 9]    => [2, 5, 9, 9]
  *  [-2, 9, 5, -3]  => [-3, -2, 5, 9]
  */
-function sortByAsc(/* arr */) {
-  throw new Error('Not implemented');
+
+function sortByAsc(arr) {
+  const arrToSort = arr;
+
+  function partition(list, low, high) {
+    const lst = list;
+    const pivot = lst[high];
+    let i = low - 1;
+    for (let j = low; j <= high - 1; j += 1) {
+      if (lst[j] < pivot) {
+        i += 1;
+        [lst[i], lst[j]] = [lst[j], lst[i]];
+      }
+    }
+    [lst[i + 1], lst[high]] = [lst[high], lst[i + 1]];
+    return i + 1;
+  }
+
+  function quickSort(toSort, low, high) {
+    if (low >= high) return;
+    const p = partition(toSort, low, high);
+
+    quickSort(toSort, low, p - 1);
+    quickSort(toSort, p + 1, high);
+  }
+
+  quickSort(arrToSort, 0, arrToSort.length - 1);
+  return arrToSort;
 }
 
 /**
@@ -462,8 +488,30 @@ function sortByAsc(/* arr */) {
  *  '012345', 3 => '024135' => '043215' => '031425'
  *  'qwerty', 3 => 'qetwry' => 'qtrewy' => 'qrwtey'
  */
-function shuffleChar(/* str, iterations */) {
-  throw new Error('Not implemented');
+function shuffleChar(str, iterations) {
+  let iter = iterations;
+  let newString = str;
+  let toEnd = '';
+  let toStart = '';
+  let i = 0;
+  while (i < iter) {
+    toEnd = '';
+    toStart = '';
+    for (let j = 1; j < str.length; j += 2) {
+      toStart += newString[j - 1];
+      toEnd += newString[j];
+    }
+    if (str.length % 2 === 1) {
+      toStart += newString[str.length - 1];
+    }
+    i += 1;
+    newString = toStart + toEnd;
+    if (newString === str) {
+      iter = iterations % i;
+      i = 0;
+    }
+  }
+  return newString;
 }
 
 /**
@@ -483,8 +531,52 @@ function shuffleChar(/* str, iterations */) {
  * @param {number} number The source number
  * @returns {number} The nearest larger number, or original number if none exists.
  */
-function getNearestBigger(/* number */) {
-  throw new Error('Not implemented');
+function getNearestBigger(number) {
+  const initNum = String(number).split('');
+  const len = initNum.length;
+  let i = 0;
+  const nums = [initNum[len - 1]];
+  do {
+    i += 1;
+    nums[i] = initNum[len - i - 1];
+  } while (initNum[len - i] === 0 || initNum[len - i] <= initNum[len - i - 1]);
+  if (len === nums.length) return number;
+  if (nums.length === 2) {
+    [initNum[len - 1], initNum[len - 2]] = [initNum[len - 2], initNum[len - 1]];
+    return Number(initNum.join(''));
+  }
+
+  for (let j = 0; j < nums.length; j += 1) {
+    for (let k = j; k < nums.length; k += 1) {
+      if (nums[k] < nums[j]) [nums[k], nums[j]] = [nums[j], nums[k]];
+    }
+  }
+  if (initNum[len - i - 1] !== '0') {
+    initNum[len - i - 1] = nums[i - 1];
+    nums[i - 1] = nums[i];
+    for (let j = 0; j < nums.length - 1; j += 1) {
+      for (let k = j; k < nums.length - 1; k += 1) {
+        if (nums[k] < nums[j]) [nums[k], nums[j]] = [nums[j], nums[k]];
+      }
+    }
+    for (; i > 0; i -= 1) {
+      initNum[len - i] = nums[nums.length - i - 1];
+    }
+    console.log(initNum);
+  } else {
+    for (let j = 1; j < nums.length; j += 1) {
+      if (nums[j] !== nums[0] && nums[j] !== '0') {
+        console.log(nums[j], j, nums[0]);
+        [nums[0], nums[j]] = [nums[j], nums[0]];
+        break;
+      }
+    }
+    for (let j = len - nums.length; j < len; j += 1) {
+      initNum[j] = nums[j - len + nums.length];
+    }
+    console.log(nums, initNum);
+  }
+  return Number(initNum.join(''));
 }
 
 module.exports = {
