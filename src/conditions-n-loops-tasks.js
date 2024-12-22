@@ -531,53 +531,76 @@ function shuffleChar(str, iterations) {
  * @param {number} number The source number
  * @returns {number} The nearest larger number, or original number if none exists.
  */
-function getNearestBigger() {
-  throw new Error('Not implemented');
-  /* const initNum = String(number).split('');
-  const len = initNum.length;
-  let i = 0;
-  const nums = [initNum[len - 1]];
-  do {
-    i += 1;
-    nums[i] = initNum[len - i - 1];
-  } while (initNum[len - i] === 0 || initNum[len - i] <= initNum[len - i - 1]);
-  if (len === nums.length) return number;
-  if (nums.length === 2) {
-    [initNum[len - 1], initNum[len - 2]] = [initNum[len - 2], initNum[len - 1]];
-    return Number(initNum.join(''));
+function getNearestBigger(number) {
+  const strNumber = String(number);
+  const nums = [];
+
+  for (let i = 0; i < strNumber.length; i += 1) {
+    nums[i] = strNumber[i];
   }
 
-  for (let j = 0; j < nums.length; j += 1) {
-    for (let k = j; k < nums.length; k += 1) {
-      if (nums[k] < nums[j]) [nums[k], nums[j]] = [nums[j], nums[k]];
+  const numsLen = nums.length;
+  let i = 1;
+  let nulls = 0;
+  const numsRevert = [nums[numsLen - 1]];
+  if (numsLen < 2) {
+    return number;
+  }
+
+  while (nums[numsLen - i - 1] >= nums[numsLen - i] && i <= numsLen) {
+    if (nums[numsLen - i - 1] === '0') {
+      nulls += 1;
+    } else {
+      numsRevert[i - nulls] = nums[numsLen - i - 1];
+    }
+    i += 1;
+  }
+
+  if (i === numsLen) {
+    return number;
+  }
+
+  if (i === 1) {
+    [nums[numsLen - i - 1], nums[numsLen - i]] = [
+      nums[numsLen - i],
+      nums[numsLen - i - 1],
+    ];
+    return Number(nums.join(''));
+  }
+
+  if (nums[numsLen - 1] === '0') {
+    numsRevert.shift();
+    nulls += 1;
+  }
+
+  for (let j = 0; j < numsRevert.length; j += 1) {
+    for (let k = j; k < numsRevert.length; k += 1) {
+      if (numsRevert[k] < numsRevert[j])
+        [numsRevert[k], numsRevert[j]] = [numsRevert[j], numsRevert[k]];
     }
   }
-  if (initNum[len - i - 1] !== '0') {
-    initNum[len - i - 1] = nums[i - 1];
-    nums[i - 1] = nums[i];
-    for (let j = 0; j < nums.length - 1; j += 1) {
-      for (let k = j; k < nums.length - 1; k += 1) {
-        if (nums[k] < nums[j]) [nums[k], nums[j]] = [nums[j], nums[k]];
-      }
+
+  for (let j = 0; j < numsRevert.length; j += 1) {
+    if (numsRevert[j] > nums[numsLen - i - 1]) {
+      [nums[numsLen - i - 1], numsRevert[j]] = [
+        numsRevert[j],
+        nums[numsLen - i - 1],
+      ];
+      break;
     }
-    for (; i > 0; i -= 1) {
-      initNum[len - i] = nums[nums.length - i - 1];
-    }
-    console.log(initNum);
-  } else {
-    for (let j = 1; j < nums.length; j += 1) {
-      if (nums[j] !== nums[0] && nums[j] !== '0') {
-        console.log(nums[j], j, nums[0]);
-        [nums[0], nums[j]] = [nums[j], nums[0]];
-        break;
-      }
-    }
-    for (let j = len - nums.length; j < len; j += 1) {
-      initNum[j] = nums[j - len + nums.length];
-    }
-    console.log(nums, initNum);
   }
-  return Number(initNum.join('')); */
+  let useNulls = nulls;
+  const delta = nums[numsLen - 1] === '0' ? 1 : 0;
+  for (; i > 0; i -= 1) {
+    if (useNulls !== 0) {
+      nums[numsLen - i] = 0;
+      useNulls -= 1;
+    } else {
+      nums[numsLen - i] = numsRevert[numsRevert.length - (i - nulls + delta)];
+    }
+  }
+
+  return Number(nums.join(''));
 }
 
 module.exports = {
